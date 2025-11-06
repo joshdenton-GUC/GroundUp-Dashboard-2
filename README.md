@@ -102,9 +102,77 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
+## 🚀 Deployment
 
-Simply open [Lovable](https://lovable.dev/projects/1d197c9d-d28d-4ab8-8b45-e943b2e209aa) and click on Share -> Publish.
+### Quick Start (30 Minutes)
+
+Follow the **[QUICK_START_DEPLOYMENT.md](./QUICK_START_DEPLOYMENT.md)** guide for a streamlined deployment process.
+
+### Comprehensive Deployment Guides
+
+- **[DEPLOYMENT_CHECKLIST.md](./DEPLOYMENT_CHECKLIST.md)** - Complete deployment checklist with all steps
+- **[VERCEL_SETUP.md](./VERCEL_SETUP.md)** - Detailed Vercel configuration guide
+- **[SETUP_GUIDE.md](./SETUP_GUIDE.md)** - Initial Supabase and Resend setup
+- **[DNS_SETUP_RESEND.md](./DNS_SETUP_RESEND.md)** - DNS configuration for email sending
+
+### Deployment Scripts
+
+Use these automated scripts to deploy your infrastructure:
+
+```bash
+# Deploy database migrations
+./deploy-migrations.sh
+
+# Deploy all edge functions
+./deploy-functions.sh
+
+# Configure Supabase secrets
+./setup-secrets.sh
+```
+
+### Manual Deployment Steps
+
+1. **Install Supabase CLI**
+   ```bash
+   # macOS
+   brew install supabase/tap/supabase
+
+   # Linux
+   wget https://github.com/supabase/cli/releases/latest
+   ```
+
+2. **Link Project**
+   ```bash
+   supabase link --project-ref wzlqbrglftrkxrfztcqd
+   ```
+
+3. **Deploy Database**
+   ```bash
+   ./deploy-migrations.sh
+   ```
+
+4. **Configure Secrets**
+   ```bash
+   ./setup-secrets.sh
+   # OR manually:
+   supabase secrets set RESEND_API_KEY=re_your_key
+   ```
+
+5. **Deploy Functions**
+   ```bash
+   ./deploy-functions.sh
+   ```
+
+6. **Deploy to Vercel**
+   - Connect GitHub repo to Vercel
+   - Configure environment variables (see VERCEL_SETUP.md)
+   - Deploy
+
+### Production URLs
+
+- **App:** https://groundupcareers.app
+- **Supabase:** https://supabase.com/dashboard/project/wzlqbrglftrkxrfztcqd
+- **Resend:** https://resend.com/emails
 
 ## Can I connect a custom domain to my Lovable project?
 
@@ -113,3 +181,5 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+For Vercel deployments, see the [VERCEL_SETUP.md](./VERCEL_SETUP.md) guide.
