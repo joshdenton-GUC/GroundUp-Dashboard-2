@@ -37,8 +37,8 @@ echo ""
 # Check if linked to remote project
 if [ ! -f ".supabase/config.toml" ]; then
     echo -e "${BLUE}🔗 Linking to remote project...${NC}"
-    echo "Project ID from config: wzlqbrglftrkxrfztcqd"
-    supabase link --project-ref wzlqbrglftrkxrfztcqd
+    echo "Project ID from config: vpvvcwvebjtibafsceqx"
+    supabase link --project-ref vpvvcwvebjtibafsceqx
     echo ""
 fi
 

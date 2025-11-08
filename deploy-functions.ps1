@@ -28,8 +28,8 @@ Write-Host ""
 # Check if linked to remote project
 if (-not (Test-Path ".supabase/config.toml")) {
     Write-Host "🔗 Linking to remote project..." -ForegroundColor Blue
-    Write-Host "Project ID from config: wzlqbrglftrkxrfztcqd"
-    supabase link --project-ref wzlqbrglftrkxrfztcqd
+    Write-Host "Project ID from config: vpvvcwvebjtibafsceqx"
+    supabase link --project-ref vpvvcwvebjtibafsceqx
     Write-Host ""
 }
 
