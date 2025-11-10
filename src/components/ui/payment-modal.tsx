@@ -13,7 +13,6 @@ import { useToast } from '@/hooks/use-toast';
 import { JOB_PRICING, JobClassification, getStripe } from '@/lib/stripe';
 import { supabase } from '@/integrations/supabase/client';
 import { Check, CreditCard, Building2, Users } from 'lucide-react';
-import { loadStripe } from '@stripe/stripe-js';
 import {
   Elements,
   PaymentElement,
@@ -323,10 +322,13 @@ export function PaymentModal({
     }
   }, [jobData, companyData, existingJobId, toast]);
 
-  // Create payment intent when modal opens
+  // Create payment intent when modal opens and reset when it closes
   useEffect(() => {
     if (isOpen && !clientSecret) {
       createPaymentIntent();
+    } else if (!isOpen && clientSecret) {
+      // Reset clientSecret when modal closes to ensure fresh state on reopen
+      setClientSecret(null);
     }
   }, [isOpen, clientSecret, createPaymentIntent]);
 
@@ -455,6 +457,7 @@ export function PaymentModal({
             </div>
           ) : clientSecret ? (
             <Elements
+              key={clientSecret}
               stripe={getStripe()}
               options={{
                 clientSecret,
