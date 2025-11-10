@@ -13,7 +13,6 @@ import { useToast } from '@/hooks/use-toast';
 import { JOB_PRICING, JobClassification, getStripe } from '@/lib/stripe';
 import { supabase } from '@/integrations/supabase/client';
 import { Check, CreditCard, Building2, Users } from 'lucide-react';
-import { loadStripe } from '@stripe/stripe-js';
 import {
   Elements,
   PaymentElement,
