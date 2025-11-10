@@ -64,13 +64,9 @@ function PaymentForm({
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isPaymentElementReady, setIsPaymentElementReady] = useState(false);
 
-  useEffect(() => {
-    if (stripe && elements) {
-      setIsLoading(false);
-    }
-  }, [stripe, elements]);
+  const isLoading = !stripe || !elements || !isPaymentElementReady;
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -121,6 +117,7 @@ function PaymentForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="border rounded-lg p-4 bg-gray-50">
         <PaymentElement
+          onReady={() => setIsPaymentElementReady(true)}
           options={{
             layout: 'tabs',
             defaultValues: {
@@ -149,9 +146,9 @@ function PaymentForm({
         <Button
           type="submit"
           className="w-full"
-          disabled={!stripe || isProcessing}
+          disabled={isLoading || isProcessing}
         >
-          {isProcessing ? 'Processing...' : `Pay for ${jobClassification} Job`}
+          {isProcessing ? 'Processing...' : isLoading ? 'Loading...' : `Pay for ${jobClassification} Job`}
         </Button>
       </div>
     </form>
