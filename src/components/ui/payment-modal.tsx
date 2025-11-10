@@ -180,6 +180,13 @@ export function PaymentModal({
     setIsLoading(true);
 
     try {
+      // Validate Stripe is configured
+      try {
+        await getStripe();
+      } catch (stripeError) {
+        throw new Error('Stripe payment system is not properly configured. Please contact support.');
+      }
+
       // Get current user
       const {
         data: { user },
@@ -199,20 +206,20 @@ export function PaymentModal({
         throw new Error('Client profile not found');
       }
 
+      // Get session for authorization
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !sessionData.session?.access_token) {
+        throw new Error('Unable to authenticate. Please log in again.');
+      }
+
       // Create payment intent
       const response = await fetch(
-        `${
-          import.meta.env.VITE_SUPABASE_URL
-        }/functions/v1/create-payment-intent`,
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-payment-intent`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${
-              (
-                await supabase.auth.getSession()
-              ).data.session?.access_token
-            }`,
+            Authorization: `Bearer ${sessionData.session.access_token}`,
           },
           body: JSON.stringify({
             jobPostData: {
@@ -240,11 +247,16 @@ export function PaymentModal({
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create payment intent');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || `Failed to create payment intent (Status: ${response.status})`);
       }
 
       const { clientSecret: secret } = await response.json();
+
+      if (!secret) {
+        throw new Error('Payment system error: No client secret received');
+      }
+
       setClientSecret(secret);
     } catch (error) {
       console.error('Payment intent creation error:', error);
@@ -256,6 +268,7 @@ export function PaymentModal({
             : 'There was an error setting up payment. Please try again.',
         variant: 'destructive',
       });
+      setClientSecret(null);
     } finally {
       setIsLoading(false);
     }
@@ -392,32 +405,56 @@ export function PaymentModal({
               <span className="ml-2">Setting up payment...</span>
             </div>
           ) : clientSecret ? (
-            <Elements
-              stripe={getStripe()}
-              options={{
-                clientSecret,
-                appearance: {
-                  theme: 'stripe',
-                  variables: {
-                    colorPrimary: '#2563eb',
-                    colorBackground: '#ffffff',
-                    colorText: '#30313d',
-                    colorDanger: '#df1b41',
-                    fontFamily: 'system-ui, sans-serif',
-                    spacingUnit: '4px',
-                    borderRadius: '8px',
-                  },
-                },
-                loader: 'auto',
-              }}
-            >
-              <PaymentForm
-                clientSecret={clientSecret}
-                onSuccess={handlePaymentSuccess}
-                onError={handlePaymentError}
-                jobClassification={jobClassification}
-              />
-            </Elements>
+            (() => {
+              try {
+                const stripePromise = getStripe();
+                return (
+                  <Elements
+                    stripe={stripePromise}
+                    options={{
+                      clientSecret,
+                      appearance: {
+                        theme: 'stripe',
+                        variables: {
+                          colorPrimary: '#2563eb',
+                          colorBackground: '#ffffff',
+                          colorText: '#30313d',
+                          colorDanger: '#df1b41',
+                          fontFamily: 'system-ui, sans-serif',
+                          spacingUnit: '4px',
+                          borderRadius: '8px',
+                        },
+                      },
+                      loader: 'auto',
+                    }}
+                  >
+                    <PaymentForm
+                      clientSecret={clientSecret}
+                      onSuccess={handlePaymentSuccess}
+                      onError={handlePaymentError}
+                      jobClassification={jobClassification}
+                    />
+                  </Elements>
+                );
+              } catch (error) {
+                console.error('Stripe loading error:', error);
+                return (
+                  <div className="text-center py-8">
+                    <p className="text-red-600 font-medium">Stripe Configuration Error</p>
+                    <p className="text-gray-500 text-sm mt-2">
+                      {error instanceof Error ? error.message : 'Unable to load payment system'}
+                    </p>
+                    <Button
+                      variant="outline"
+                      onClick={() => window.location.reload()}
+                      className="mt-4"
+                    >
+                      Reload Page
+                    </Button>
+                  </div>
+                );
+              }
+            })()
           ) : (
             <div className="text-center py-8">
               <p className="text-gray-500">Failed to initialize payment</p>

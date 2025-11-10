@@ -15,16 +15,40 @@ serve(async req => {
   }
 
   try {
+    // Validate environment variables
+    const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+    if (!stripeSecretKey) {
+      console.error('STRIPE_SECRET_KEY is not configured');
+      return new Response(
+        JSON.stringify({ error: 'Payment system configuration error. Please contact support.' }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error('Supabase configuration is missing');
+      return new Response(
+        JSON.stringify({ error: 'Database configuration error. Please contact support.' }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
     // Initialize Stripe
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+    const stripe = new Stripe(stripeSecretKey, {
       apiVersion: '2023-10-16',
     });
 
     // Initialize Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    const supabaseClient = createClient(supabaseUrl, supabaseServiceKey);
 
     const { jobPostData, clientId, companyData, existingJobId } =
       await req.json();
@@ -144,6 +168,7 @@ serve(async req => {
     }
 
     // Create Stripe Payment Intent
+    console.log(`Creating payment intent for job post ${jobPost.id}, amount: $${jobPricing.price / 100}`);
 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: jobPricing.price,
@@ -160,6 +185,7 @@ serve(async req => {
     });
 
     console.log('PaymentIntent created successfully:', paymentIntent.id);
+    console.log('Client secret generated:', paymentIntent.client_secret ? 'Yes' : 'No');
 
     // Update job post with payment intent ID
     const { error: updateError } = await supabaseClient

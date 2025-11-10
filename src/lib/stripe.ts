@@ -6,8 +6,26 @@ const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 let stripePromise: Promise<Stripe | null>;
 
 export const getStripe = () => {
+  if (!stripePublishableKey) {
+    console.error('Stripe publishable key is not defined. Please check your .env file.');
+    console.error('Current env:', import.meta.env);
+    throw new Error('Stripe publishable key is missing. Please configure VITE_STRIPE_PUBLISHABLE_KEY in your .env file.');
+  }
+
   if (!stripePromise) {
+    console.log('Initializing Stripe with key:', stripePublishableKey.substring(0, 20) + '...');
     stripePromise = loadStripe(stripePublishableKey);
+
+    // Validate that Stripe loaded successfully
+    stripePromise.then((stripe) => {
+      if (stripe) {
+        console.log('Stripe loaded successfully');
+      } else {
+        console.error('Stripe failed to load - returned null');
+      }
+    }).catch((error) => {
+      console.error('Stripe loading error:', error);
+    });
   }
   return stripePromise;
 };
