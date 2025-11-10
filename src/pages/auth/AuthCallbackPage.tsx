@@ -9,6 +9,19 @@ const AuthCallbackPage = () => {
   const location = useLocation();
   const [emailAlertSent, setEmailAlertSent] = useState(false);
 
+  // Check if this is a password recovery flow
+  useEffect(() => {
+    const checkForRecoveryFlow = () => {
+      // If the hash contains type=recovery, redirect to reset password page
+      if (location.hash && location.hash.includes('type=recovery')) {
+        console.log('[AuthCallback] Recovery flow detected, redirecting to reset password page');
+        navigate('/reset-password', { replace: true });
+      }
+    };
+    
+    checkForRecoveryFlow();
+  }, [location.hash, navigate]);
+
   const redirectUser = useCallback(() => {
     // Redirect based on user role
     if (profile?.role === 'admin') {

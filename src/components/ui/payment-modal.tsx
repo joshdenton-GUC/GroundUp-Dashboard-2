@@ -55,11 +55,15 @@ function PaymentForm({
   onSuccess,
   onError,
   jobClassification,
+  userName,
+  userEmail,
 }: {
   clientSecret: string;
   onSuccess: () => void;
   onError: (error: string) => void;
   jobClassification: JobClassification;
+  userName?: string;
+  userEmail?: string;
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -126,8 +130,8 @@ function PaymentForm({
             layout: 'tabs',
             defaultValues: {
               billingDetails: {
-                name: '',
-                email: '',
+                name: userName || '',
+                email: userEmail || '',
               },
             },
           }}
@@ -172,9 +176,54 @@ export function PaymentModal({
 }: PaymentModalProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [userName, setUserName] = useState<string>('');
+  const [userEmail, setUserEmail] = useState<string>('');
   const { toast } = useToast();
 
   const pricing = JOB_PRICING[jobClassification];
+
+  // Fetch user information for pre-filling the payment form
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        
+        if (user) {
+          setUserEmail(user.email || '');
+          
+          // Try to get the full name from the profile
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('user_id', user.id)
+            .single();
+          
+          if (profileData?.full_name) {
+            setUserName(profileData.full_name);
+          } else {
+            // If no full name in profile, try to get company name from clients table
+            const { data: clientData } = await supabase
+              .from('clients')
+              .select('company_name')
+              .eq('user_id', user.id)
+              .single();
+            
+            if (clientData?.company_name) {
+              setUserName(clientData.company_name);
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user info for payment form:', error);
+      }
+    };
+
+    if (isOpen) {
+      fetchUserInfo();
+    }
+  }, [isOpen]);
 
   const createPaymentIntent = useCallback(async () => {
     setIsLoading(true);
@@ -416,6 +465,8 @@ export function PaymentModal({
                 onSuccess={handlePaymentSuccess}
                 onError={handlePaymentError}
                 jobClassification={jobClassification}
+                userName={userName}
+                userEmail={userEmail}
               />
             </Elements>
           ) : (
