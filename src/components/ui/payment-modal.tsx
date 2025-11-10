@@ -453,6 +453,13 @@ export function PaymentModal({
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               <span className="ml-2">Setting up payment...</span>
             </div>
+          ) : !getStripe() ? (
+            <div className="text-center py-8">
+              <p className="text-red-500 font-medium">Stripe is not configured</p>
+              <p className="text-gray-500 text-sm mt-2">
+                Please contact support to complete your payment.
+              </p>
+            </div>
           ) : clientSecret ? (
             <Elements
               stripe={getStripe()}
