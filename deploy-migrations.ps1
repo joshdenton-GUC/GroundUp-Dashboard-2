@@ -28,8 +28,8 @@ Write-Host ""
 # Check if linked to remote project
 if (-not (Test-Path ".supabase/config.toml")) {
     Write-Host "🔗 Linking to remote project..." -ForegroundColor Blue
-    Write-Host "Project ID from config: wzlqbrglftrkxrfztcqd"
-    supabase link --project-ref wzlqbrglftrkxrfztcqd
+    Write-Host "Project ID from config: vpvvcwvebjtibafsceqx"
+    supabase link --project-ref vpvvcwvebjtibafsceqx
     Write-Host ""
 }
 
@@ -91,7 +91,7 @@ Write-Host "==============================================" -ForegroundColor Blu
 Write-Host "🔍 Next Steps:" -ForegroundColor Blue
 Write-Host "==============================================" -ForegroundColor Blue
 Write-Host "1. Verify database schema in Supabase Dashboard:"
-Write-Host "   https://supabase.com/dashboard/project/wzlqbrglftrkxrfztcqd/editor"
+Write-Host "   https://supabase.com/dashboard/project/vpvvcwvebjtibafsceqx/editor"
 Write-Host ""
 Write-Host "2. Test your tables:"
 Write-Host "   - profiles"

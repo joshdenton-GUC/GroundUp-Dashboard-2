@@ -33,8 +33,8 @@ echo ""
 # Check if linked to remote project
 if [ ! -f ".supabase/config.toml" ]; then
     echo -e "${BLUE}🔗 Linking to remote project...${NC}"
-    echo "Project ID from config: wzlqbrglftrkxrfztcqd"
-    supabase link --project-ref wzlqbrglftrkxrfztcqd
+    echo "Project ID from config: vpvvcwvebjtibafsceqx"
+    supabase link --project-ref vpvvcwvebjtibafsceqx
     echo ""
 fi
 
@@ -91,7 +91,7 @@ echo "=============================================="
 echo "🔍 Next Steps:"
 echo "=============================================="
 echo "1. Verify database schema in Supabase Dashboard:"
-echo "   https://supabase.com/dashboard/project/wzlqbrglftrkxrfztcqd/editor"
+echo "   https://supabase.com/dashboard/project/vpvvcwvebjtibafsceqx/editor"
 echo ""
 echo "2. Test your tables:"
 echo "   - profiles"
