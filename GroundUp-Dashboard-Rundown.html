@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GroundUp Dashboard - Platform Overview</title>
+    <style>
+        @page {
+            margin: 0.75in;
+            size: letter;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 30px;
+            font-size: 28px;
+        }
+
+        h2 {
+            color: #2980b9;
+            margin-top: 25px;
+            font-size: 22px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #34495e;
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        h4 {
+            color: #555;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+
+        p {
+            margin: 10px 0;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin: 10px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 5px 0;
+        }
+
+        strong {
+            color: #2c3e50;
+        }
+
+        .summary-box {
+            background: #ecf0f1;
+            border-left: 5px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .feature-section {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .workflow-box {
+            background: #e8f4f8;
+            border: 2px solid #3498db;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+
+        .pricing {
+            background: #d5f4e6;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 5px 0;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid #e0e0e0;
+            margin: 30px 0;
+        }
+
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            margin: -20px -20px 30px -20px;
+            border-radius: 0;
+        }
+
+        .header h1 {
+            color: white;
+            border: none;
+            margin: 0;
+            font-size: 32px;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .icon {
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+            }
+
+            .header {
+                margin: 0;
+                page-break-after: avoid;
+            }
+
+            h1, h2, h3 {
+                page-break-after: avoid;
+            }
+
+            .feature-section, .workflow-box, .summary-box {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>GroundUp Dashboard</h1>
+        <p>Platform Overview - Comprehensive Feature Documentation</p>
+    </div>
+
+    <div class="summary-box">
+        <h2>Executive Summary</h2>
+        <p>GroundUp Dashboard is a <strong>B2B recruitment SaaS platform</strong> designed to streamline the hiring process for companies while providing administrative oversight and management. The platform features a dual-role architecture serving both <strong>Administrators</strong> (your team) and <strong>Clients</strong> (businesses hiring talent).</p>
+    </div>
+
+    <h2>Technology Stack</h2>
+    <ul>
+        <li><strong>Frontend</strong>: React with TypeScript, modern UI framework (shadcn/ui)</li>
+        <li><strong>Backend</strong>: Supabase (PostgreSQL database + serverless functions)</li>
+        <li><strong>Payments</strong>: Stripe integration for secure payment processing</li>
+        <li><strong>AI</strong>: Google Gemini for intelligent resume parsing</li>
+        <li><strong>Email</strong>: Resend for transactional emails and notifications</li>
+        <li><strong>Hosting</strong>: Vercel with automatic deployments</li>
+    </ul>
+
+    <hr>
+
+    <h1>ADMIN FEATURES</h1>
+
+    <h2>1. Admin Dashboard Overview</h2>
+    <p>A comprehensive control center with seven main sections:</p>
+
+    <div class="feature-section">
+        <h3><span class="icon">📊</span>Analytics & Overview</h3>
+        <ul>
+            <li><strong>Key Metrics</strong>: Total candidates, active clients, monthly growth tracking</li>
+            <li><strong>Activity Feed</strong>: Real-time view of user registrations, job postings, and payments</li>
+            <li><strong>Performance Analytics</strong>: Job posting trends, candidate pipeline metrics</li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3><span class="icon">👥</span>Client Management</h3>
+        <ul>
+            <li>View all registered companies and their details</li>
+            <li><strong>Account Control</strong>: Activate/deactivate client accounts</li>
+            <li><strong>Status Tracking</strong>: Monitor welcome email delivery and account confirmation</li>
+            <li><strong>Invitation System</strong>: Resend invitations to unconfirmed clients</li>
+            <li>Search and filter by client status</li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3><span class="icon">📝</span>Candidate Management</h3>
+        <ul>
+            <li><strong>Centralized Database</strong>: View all candidates across all clients</li>
+            <li><strong>Advanced Search</strong>: Filter by name, email, skills, or status</li>
+            <li><strong>Status Tracking</strong>: Monitor candidates through hiring pipeline:
+                <ul>
+                    <li>Pending Review</li>
+                    <li>Reviewing</li>
+                    <li>Interviewing</li>
+                    <li>Interviewed</li>
+                    <li>Hired / Not Hired</li>
+                    <li>Rejected / Withdrawn</li>
+                </ul>
+            </li>
+            <li><strong>Resume Access</strong>: View and download candidate resumes directly</li>
+            <li><strong>Real-time Updates</strong>: Live data synchronization</li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3><span class="icon">📤</span>Bulk Resume Upload</h3>
+        <ul>
+            <li><strong>AI-Powered Parsing</strong>: Upload resumes in PDF, DOCX, or TXT format</li>
+            <li><strong>Automatic Extraction</strong>: Gemini AI extracts:
+                <ul>
+                    <li>Name, email, phone</li>
+                    <li>Skills and experience</li>
+                    <li>Education and location</li>
+                    <li>Professional summary</li>
+                </ul>
+            </li>
+            <li><strong>Batch Processing</strong>: Upload multiple resumes at once</li>
+            <li><strong>Storage</strong>: Secure resume file storage with access controls</li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3><span class="icon">➕</span>Client Invitation System</h3>
+        <ul>
+            <li><strong>Onboard New Clients</strong>: Invite companies to join the platform</li>
+            <li><strong>Automated Emails</strong>: System sends invitation and welcome emails</li>
+            <li><strong>Profile Setup</strong>: Collect company information:
+                <ul>
+                    <li>Company name, contact details</li>
+                    <li>Full address (street, city, state, zip)</li>
+                    <li>Email and phone</li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3><span class="icon">📧</span>Email Alert Configuration</h3>
+        <ul>
+            <li><strong>Customizable Notifications</strong>: Configure who receives alerts for:
+                <ul>
+                    <li>New job postings</li>
+                    <li>Job status changes</li>
+                    <li>New client registrations</li>
+                    <li>Payment failures ("no sale" alerts)</li>
+                </ul>
+            </li>
+            <li><strong>Multiple Recipients</strong>: Add multiple email addresses per alert type</li>
+            <li><strong>Enable/Disable</strong>: Toggle alerts on or off as needed</li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3><span class="icon">🔒</span>Security Audit Log</h3>
+        <ul>
+            <li><strong>Compliance Tracking</strong>: Complete audit trail of all admin actions</li>
+            <li><strong>Detailed Records</strong>: User, timestamp, IP address, action type</li>
+            <li><strong>Resource Tracking</strong>: What was changed and when</li>
+            <li><strong>Filtering</strong>: Search by action type and resource</li>
+        </ul>
+    </div>
+
+    <hr>
+
+    <h1>CLIENT FEATURES</h1>
+
+    <h2>2. Client Dashboard</h2>
+    <p>A streamlined interface for companies to post jobs and manage candidates:</p>
+
+    <div class="feature-section">
+        <h3><span class="icon">💼</span>Post New Job</h3>
+        <p><strong>Company Profile Integration</strong>: Pre-fill company information</p>
+        <ul>
+            <li>Company name, address, phone, email, website</li>
+            <li>Company description</li>
+            <li>Template saved for future posts</li>
+        </ul>
+
+        <p><strong>Job Details Form</strong>:</p>
+        <ul>
+            <li>Job title and type (Full-time, Part-time, Contract, Temporary)</li>
+            <li><strong>Two-Tier Pricing</strong>:
+                <div class="pricing">
+                    <strong>STANDARD</strong>: $500<br>
+                    <strong>PREMIUM</strong>: $1,500
+                </div>
+            </li>
+            <li>Location and salary range</li>
+            <li>Job description, requirements, benefits</li>
+            <li>Form validation with error checking</li>
+        </ul>
+
+        <ul>
+            <li><strong>Save as Draft</strong>: Work on jobs before posting</li>
+            <li><strong>Payment Integration</strong>: Secure Stripe checkout when ready to post</li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3><span class="icon">📋</span>Manage Jobs</h3>
+        <ul>
+            <li><strong>Job List View</strong>: All posted jobs in one place</li>
+            <li><strong>Search & Filter</strong>: Find jobs by title or status</li>
+            <li><strong>Status Management</strong>:
+                <ul>
+                    <li>Pause active jobs</li>
+                    <li>Resume paused jobs</li>
+                    <li>Mark as filled</li>
+                    <li>Cancel postings</li>
+                </ul>
+            </li>
+            <li><strong>Job Details</strong>: View full posting information</li>
+            <li><strong>PDF Export</strong>: Download job posting as PDF</li>
+            <li><strong>Expiration Tracking</strong>: 30-day automatic expiration</li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3><span class="icon">🎯</span>Review Candidates</h3>
+        <ul>
+            <li><strong>Sequential Review Workflow</strong>: Review candidates one at a time</li>
+            <li><strong>Complete Candidate Profiles</strong>:
+                <ul>
+                    <li>Resume and contact information</li>
+                    <li>Skills and experience summary</li>
+                    <li>Education background</li>
+                </ul>
+            </li>
+            <li><strong>Quick Actions</strong>:
+                <ul>
+                    <li><strong>Accept</strong>: Move to hired status</li>
+                    <li><strong>Reject</strong>: Mark as not hired with notes</li>
+                    <li><strong>Interview</strong>: Schedule or mark for interview</li>
+                </ul>
+            </li>
+            <li><strong>Next/Previous Navigation</strong>: Move through pending candidates easily</li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3><span class="icon">📊</span>Job Staging</h3>
+        <ul>
+            <li><strong>Pre-Payment Preview</strong>: Review complete job posting before payment</li>
+            <li><strong>Payment Confirmation</strong>: See pricing and terms before committing</li>
+            <li><strong>"Ready to Post" Button</strong>: Initiate secure Stripe payment</li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3><span class="icon">✅</span>Hired Talent</h3>
+        <ul>
+            <li><strong>View All Hires</strong>: See everyone you've hired through the platform</li>
+            <li><strong>Hire Dates</strong>: Track when each candidate was hired</li>
+            <li><strong>Candidate Information</strong>: Access full candidate profiles</li>
+            <li><strong>Search & Filter</strong>: Find specific hires quickly</li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3><span class="icon">👤</span>Manage Candidates</h3>
+        <ul>
+            <li><strong>Detailed Candidate Management</strong>: View all candidates assigned to your company</li>
+            <li><strong>Edit Information</strong>: Update candidate details</li>
+            <li><strong>Upload Resumes</strong>: Add or replace candidate documents</li>
+            <li><strong>Communication History</strong>: Track interactions with candidates</li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3><span class="icon">🏢</span>Company Profile</h3>
+        <ul>
+            <li><strong>Edit Company Information</strong>: Update details anytime</li>
+            <li><strong>Address Management</strong>: Full address fields</li>
+            <li><strong>Contact Information</strong>: Keep phone and email current</li>
+            <li><strong>Company Description</strong>: Update company overview</li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3><span class="icon">❓</span>How To / Help Center</h3>
+        <ul>
+            <li><strong>Feature Guides</strong>: Step-by-step instructions</li>
+            <li><strong>FAQ Section</strong>: Common questions answered</li>
+            <li><strong>Support Documentation</strong>: Comprehensive help resources</li>
+        </ul>
+    </div>
+
+    <hr>
+
+    <h1>PAYMENT PROCESSING</h1>
+
+    <h2>Secure Stripe Integration</h2>
+
+    <div class="pricing">
+        <strong>Two-Tier Pricing Model:</strong><br>
+        STANDARD Job Posts: $500<br>
+        PREMIUM Job Posts: $1,500
+    </div>
+
+    <h3>Payment Flow:</h3>
+    <div class="workflow-box">
+1. Client completes job posting form<br>
+2. Saves as draft (free)<br>
+3. When ready, initiates payment<br>
+4. Secure Stripe payment form<br>
+5. Payment processed<br>
+6. Job automatically posted live<br>
+7. Invoice emailed to client<br>
+8. Admin receives "new job" alert
+    </div>
+
+    <h3>Payment Features:</h3>
+    <ul>
+        <li>PCI-compliant security</li>
+        <li>Multiple payment methods (cards, digital wallets)</li>
+        <li>Automatic invoice generation</li>
+        <li>Failed payment handling</li>
+        <li>Transaction audit trail</li>
+        <li>Payment status tracking</li>
+    </ul>
+
+    <hr>
+
+    <h1>EMAIL NOTIFICATION SYSTEM</h1>
+
+    <h2>Automated Email Alerts</h2>
+
+    <h3>Client Emails:</h3>
+    <ul>
+        <li>Welcome email upon registration</li>
+        <li>Payment invoices/receipts</li>
+        <li>Job posting confirmations</li>
+        <li>Candidate status updates</li>
+    </ul>
+
+    <h3>Admin Alerts (Configurable):</h3>
+    <ul>
+        <li>New job posted notification</li>
+        <li>Job status change alerts</li>
+        <li>New client registration</li>
+        <li>Payment failures ("no sale")</li>
+    </ul>
+
+    <p><strong>Email Provider</strong>: Resend (reliable transactional email service)<br>
+    <strong>Customizable Recipients</strong>: Configure who receives each alert type</p>
+
+    <hr>
+
+    <h1>SECURITY & COMPLIANCE</h1>
+
+    <h2>Data Security</h2>
+    <ul>
+        <li><strong>Role-Based Access Control</strong>: Strict separation of admin and client data</li>
+        <li><strong>Row-Level Security</strong>: Clients can only see their own data</li>
+        <li><strong>Encrypted Storage</strong>: Sensitive data encrypted at rest</li>
+        <li><strong>Audit Logging</strong>: Complete trail of all admin actions</li>
+        <li><strong>Secure Authentication</strong>: Email/password with optional OAuth (Google, Apple)</li>
+    </ul>
+
+    <h2>Payment Security</h2>
+    <ul>
+        <li><strong>PCI Compliance</strong>: Stripe handles all payment data</li>
+        <li><strong>No Card Storage</strong>: No raw card data stored in database</li>
+        <li><strong>Webhook Verification</strong>: Signature verification on all payment events</li>
+        <li><strong>Transaction Logging</strong>: Complete payment audit trail</li>
+    </ul>
+
+    <h2>Privacy</h2>
+    <ul>
+        <li><strong>Data Isolation</strong>: Multi-tenant architecture with complete data separation</li>
+        <li><strong>User Consent</strong>: Terms of service and privacy policy acceptance</li>
+        <li><strong>Email Preferences</strong>: Configurable notification settings</li>
+    </ul>
+
+    <hr>
+
+    <h1>KEY DIFFERENTIATORS</h1>
+
+    <div class="feature-section">
+        <h3>1. AI-Powered Resume Intelligence</h3>
+        <ul>
+            <li>Automatic parsing of uploaded resumes using Google Gemini AI</li>
+            <li>Extracts structured candidate data</li>
+            <li>Supports PDF, DOCX, and TXT formats</li>
+            <li>Reduces manual data entry by 90%</li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3>2. Two-Tier Job Pricing</h3>
+        <ul>
+            <li>Flexible pricing model: Standard ($500) and Premium ($1,500)</li>
+            <li>Allows businesses to choose level of visibility</li>
+            <li>Revenue optimization for different job types</li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3>3. Sequential Candidate Review</h3>
+        <ul>
+            <li>Focused, one-at-a-time candidate review workflow</li>
+            <li>Reduces decision fatigue</li>
+            <li>Ensures thorough evaluation of each candidate</li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3>4. Complete Payment Integration</h3>
+        <ul>
+            <li>Stripe payment processing built directly into workflow</li>
+            <li>No manual invoicing or payment tracking needed</li>
+            <li>Automatic job posting upon payment confirmation</li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3>5. Real-Time Updates</h3>
+        <ul>
+            <li>Live candidate counts and status updates</li>
+            <li>Real-time data synchronization across dashboard</li>
+            <li>Instant notifications via email</li>
+        </ul>
+    </div>
+
+    <div class="feature-section">
+        <h3>6. Comprehensive Admin Oversight</h3>
+        <ul>
+            <li>Full visibility into all client activities</li>
+            <li>Security audit logging for compliance</li>
+            <li>Configurable email alert system</li>
+            <li>Client account management controls</li>
+        </ul>
+    </div>
+
+    <hr>
+
+    <h1>DATA FLOW OVERVIEW</h1>
+
+    <h3>Job Posting Workflow</h3>
+    <div class="workflow-box">
+Client creates job → Saves as draft → Reviews in staging →
+Initiates payment → Stripe processes → Payment succeeds →
+Job posted live → Invoice sent → Admin notified →
+Job expires after 30 days (or marked filled)
+    </div>
+
+    <h3>Candidate Management Workflow</h3>
+    <div class="workflow-box">
+Admin uploads resume → AI parses information →
+Candidate profile created → Assigned to client →
+Client reviews candidate → Accept/Reject/Interview →
+Status updated → Notifications sent →
+Hired candidates tracked in "Hired Talent"
+    </div>
+
+    <h3>Client Onboarding Workflow</h3>
+    <div class="workflow-box">
+Admin invites client → Invitation email sent →
+Client registers → Company profile created →
+Welcome email sent → Account activated →
+Client posts first job
+    </div>
+
+    <hr>
+
+    <h1>PLATFORM METRICS & ANALYTICS</h1>
+
+    <h3>Admin Dashboards Track:</h3>
+    <ul>
+        <li>Total candidates in system</li>
+        <li>Active client count</li>
+        <li>Monthly growth rates</li>
+        <li>Payment transactions</li>
+        <li>Job posting activity</li>
+        <li>Candidate status distribution</li>
+        <li>User registration trends</li>
+    </ul>
+
+    <h3>Client Dashboards Show:</h3>
+    <ul>
+        <li>Number of active job posts</li>
+        <li>Pending candidate reviews (with badge count)</li>
+        <li>Total hired talent</li>
+        <li>Job posting history</li>
+        <li>Payment history</li>
+    </ul>
+
+    <hr>
+
+    <h1>INTEGRATION CAPABILITIES</h1>
+
+    <h3>Current Integrations:</h3>
+    <ul>
+        <li><strong>Supabase</strong>: Database, authentication, file storage, serverless functions</li>
+        <li><strong>Stripe</strong>: Payment processing and invoicing</li>
+        <li><strong>Resend</strong>: Transactional email delivery</li>
+        <li><strong>Google Gemini</strong>: AI-powered resume parsing</li>
+        <li><strong>Vercel</strong>: Hosting and deployment</li>
+    </ul>
+
+    <h3>Email Service Features:</h3>
+    <ul>
+        <li>Bounce and complaint handling</li>
+        <li>Delivery status tracking</li>
+        <li>Unsubscribe management</li>
+        <li>DKIM/SPF/DMARC for deliverability</li>
+    </ul>
+
+    <hr>
+
+    <h1>MOBILE & RESPONSIVE DESIGN</h1>
+    <ul>
+        <li>Fully responsive interface</li>
+        <li>Works on desktop, tablet, and mobile</li>
+        <li>Touch-friendly navigation</li>
+        <li>Optimized forms for mobile input</li>
+    </ul>
+
+    <h2>Browser Support</h2>
+    <ul>
+        <li>Chrome, Firefox, Safari, Edge (latest versions)</li>
+        <li>Dark mode and light mode support</li>
+        <li>Accessibility features for screen readers</li>
+    </ul>
+
+    <hr>
+
+    <div class="summary-box">
+        <h1>SUMMARY</h1>
+        <p>The GroundUp Dashboard is a <strong>production-ready, enterprise-grade recruitment platform</strong> designed for scalability and ease of use. It provides:</p>
+
+        <h3>For Administrators:</h3>
+        <ul>
+            <li>Complete oversight of all clients and candidates</li>
+            <li>AI-powered resume processing</li>
+            <li>Configurable email notification system</li>
+            <li>Security and compliance features</li>
+            <li>Analytics and reporting</li>
+        </ul>
+
+        <h3>For Clients:</h3>
+        <ul>
+            <li>Simple job posting with secure payment</li>
+            <li>Focused candidate review workflow</li>
+            <li>Complete hiring pipeline management</li>
+            <li>Automated notifications</li>
+            <li>Company profile management</li>
+        </ul>
+
+        <h3>Business Value:</h3>
+        <ul>
+            <li>Reduces time-to-hire by streamlining candidate review</li>
+            <li>Automates manual processes (resume parsing, payments, notifications)</li>
+            <li>Provides complete audit trail for compliance</li>
+            <li>Scalable multi-tenant architecture</li>
+            <li>Revenue-generating two-tier pricing model</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        <p><strong>Document Generated:</strong> November 11, 2025</p>
+        <p><strong>GroundUp Dashboard Platform Documentation</strong></p>
+    </div>
+</body>
+</html>
