@@ -74,19 +74,37 @@ export function DocumentUploader() {
   const fetchClients = useCallback(async () => {
     try {
       setLoadingClients(true);
-      const { data, error } = await supabase
+
+      // Fetch clients
+      const { data: clientsData, error: clientsError } = await supabase
         .from('clients')
-        .select('id, company_name, user_id, profiles(email)')
+        .select('id, company_name, user_id')
         .order('company_name');
 
-      if (error) throw error;
+      if (clientsError) throw clientsError;
+
+      // Get unique user IDs
+      const userIds = [...new Set((clientsData || []).map(c => c.user_id))];
+
+      // Fetch profiles for these user IDs
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('user_id, email')
+        .in('user_id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Create a map of profiles by user_id
+      const profilesMap = new Map(
+        (profilesData || []).map(p => [p.user_id, p])
+      );
 
       // Map the data to include email from profiles
-      const clientsWithEmail = (data || []).map(client => ({
+      const clientsWithEmail = (clientsData || []).map(client => ({
         id: client.id,
         company_name: client.company_name,
         user_id: client.user_id,
-        email: (client.profiles as any)?.email || null,
+        email: profilesMap.get(client.user_id)?.email || null,
       }));
 
       setClients(clientsWithEmail);
@@ -432,8 +450,7 @@ export function DocumentUploader() {
     if (
       !user ||
       !selectedFile ||
-      !formData.selectedClient ||
-      !formData.selectedJobPost
+      !formData.selectedClient
     )
       return;
 
@@ -773,7 +790,7 @@ export function DocumentUploader() {
           {formData.selectedClient && (
             <div className="space-y-2">
               <Label htmlFor="job-post-selection" className="text-foreground">
-                Select Job Position *
+                Select Job Position (Optional)
               </Label>
               <Select
                 value={formData.selectedJobPost}
@@ -807,9 +824,8 @@ export function DocumentUploader() {
                 </SelectContent>
               </Select>
               {jobPosts.length === 0 && !loadingJobPosts && (
-                <p className="text-sm text-yellow-600">
-                  ⚠️ This client has no active posted jobs. Only paid and
-                  published jobs are available for candidate assignment.
+                <p className="text-sm text-blue-600">
+                  ℹ️ This client has no active posted jobs. You can still upload the resume without selecting a specific job position.
                 </p>
               )}
               {formData.selectedJobPost && (

@@ -99,30 +99,78 @@ export function CandidateManager() {
 
   const fetchCandidates = useCallback(async () => {
     try {
-      const { data, error } = await supabase
+      // Fetch all candidates
+      const { data: candidatesData, error: candidatesError } = await supabase
         .from('candidates')
-        .select(
-          `
-          *,
-          clients!candidates_client_id_fkey (
-            company_name,
-            user_id,
-            profiles!clients_user_id_fkey (
-              email
-            )
-          )
-        `
-        )
+        .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (candidatesError) throw candidatesError;
+
+      // Get unique client IDs
+      const clientIds = [
+        ...new Set(
+          (candidatesData || [])
+            .map(c => c.client_id)
+            .filter(Boolean) as string[]
+        ),
+      ];
+
+      if (clientIds.length === 0) {
+        // No clients to fetch, just use candidates data
+        const transformedData = (candidatesData || []).map(candidate => ({
+          ...candidate,
+          client_name: null,
+          client_email: null,
+        }));
+        setCandidates(transformedData);
+        return;
+      }
+
+      // Fetch clients
+      const { data: clientsData, error: clientsError } = await supabase
+        .from('clients')
+        .select('id, company_name, user_id')
+        .in('id', clientIds);
+
+      if (clientsError) throw clientsError;
+
+      // Get unique user IDs from clients
+      const userIds = [
+        ...new Set((clientsData || []).map(c => c.user_id).filter(Boolean)),
+      ];
+
+      // Fetch profiles for these user IDs
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('user_id, email')
+        .in('user_id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Create maps for efficient lookup
+      const profilesMap = new Map(
+        (profilesData || []).map(p => [p.user_id, p])
+      );
+      const clientsMap = new Map(
+        (clientsData || []).map(c => ({
+          ...c,
+          profile: profilesMap.get(c.user_id),
+        }))
+          .map(c => [c.id, c])
+      );
 
       // Transform the data to include client_name and client_email
-      const transformedData = (data || []).map(candidate => ({
-        ...candidate,
-        client_name: candidate.clients?.company_name || null,
-        client_email: candidate.clients?.profiles?.email || null,
-      }));
+      const transformedData = (candidatesData || []).map(candidate => {
+        const client = candidate.client_id
+          ? clientsMap.get(candidate.client_id)
+          : null;
+        return {
+          ...candidate,
+          client_name: client?.company_name || null,
+          client_email: client?.profile?.email || null,
+        };
+      });
 
       setCandidates(transformedData);
     } catch (error: any) {

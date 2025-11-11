@@ -72,45 +72,18 @@ serve(async req => {
       );
     }
 
-    // Fetch all clients with profiles (only clients, not admins)
-    const { data: clients, error: clientsError } = await supabaseAdmin
-      .from('clients')
-      .select(
-        `
-        *,
-        profiles!inner (
-          email,
-          full_name,
-          role,
-          is_active,
-          user_id
-        )
-      `
-      )
-      .eq('profiles.role', 'client')
-      .order('created_at', { ascending: false });
+    // Use SQL function to fetch clients with profiles
+    // This bypasses PostgREST's foreign key validation issues
+    console.log('Fetching clients via SQL function...');
+    const { data: clientsWithStatus, error: rpcError } = await supabaseAdmin
+      .rpc('get_clients_with_status');
 
-    if (clientsError) throw clientsError;
+    if (rpcError) {
+      console.error('Error calling get_clients_with_status:', rpcError);
+      throw new Error(`Failed to fetch clients: ${rpcError.message}`);
+    }
 
-    // Get all auth users to check confirmation status
-    const {
-      data: { users },
-      error: usersError,
-    } = await supabaseAdmin.auth.admin.listUsers();
-
-    if (usersError) throw usersError;
-
-    // Map clients with their confirmation status
-    const clientsWithStatus = clients?.map(client => {
-      const authUser = users?.find(u => u.id === client.user_id);
-      const isConfirmed = !!authUser?.email_confirmed_at;
-
-      return {
-        ...client,
-        invitation_status: isConfirmed ? 'confirmed' : 'pending',
-        email_confirmed_at: authUser?.email_confirmed_at || null,
-      };
-    });
+    console.log(`Found ${clientsWithStatus?.length || 0} clients`);
 
     return new Response(
       JSON.stringify({
@@ -124,9 +97,12 @@ serve(async req => {
     );
   } catch (error) {
     console.error('Error fetching clients:', error);
+    console.error('Error details:', JSON.stringify(error, null, 2));
     return new Response(
       JSON.stringify({
         error: error.message || 'An unexpected error occurred',
+        details: error.toString(),
+        stack: error.stack,
       }),
       {
         status: 500,
