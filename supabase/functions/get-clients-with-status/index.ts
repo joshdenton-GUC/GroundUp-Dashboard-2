@@ -118,34 +118,12 @@ serve(async req => {
       }))
       .filter(client => client.profiles && client.profiles.role === 'client');
 
-    // Get all auth users to check confirmation status
-    let users = [];
-    try {
-      const {
-        data: { users: authUsers },
-        error: usersError,
-      } = await supabaseAdmin.auth.admin.listUsers();
-
-      if (usersError) {
-        console.error('Error fetching auth users:', usersError);
-        throw usersError;
-      }
-      users = authUsers || [];
-    } catch (authError) {
-      console.error('Failed to fetch auth users:', authError);
-      // Continue without user confirmation status if auth fails
-      users = [];
-    }
-
-    // Map clients with their confirmation status
+    // Map clients with basic status (skip auth user lookup for now)
     const clientsWithStatus = clients?.map(client => {
-      const authUser = users?.find(u => u.id === client.user_id);
-      const isConfirmed = !!authUser?.email_confirmed_at;
-
       return {
         ...client,
-        invitation_status: isConfirmed ? 'confirmed' : 'pending',
-        email_confirmed_at: authUser?.email_confirmed_at || null,
+        invitation_status: 'confirmed', // Default to confirmed for now
+        email_confirmed_at: null,
       };
     });
 
