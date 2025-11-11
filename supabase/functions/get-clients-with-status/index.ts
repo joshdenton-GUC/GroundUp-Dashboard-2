@@ -72,25 +72,47 @@ serve(async req => {
       );
     }
 
-    // Fetch all clients with profiles (only clients, not admins)
-    const { data: clients, error: clientsError } = await supabaseAdmin
+    // Fetch all clients
+    const { data: allClients, error: clientsError } = await supabaseAdmin
       .from('clients')
-      .select(
-        `
-        *,
-        profiles!inner (
-          email,
-          full_name,
-          role,
-          is_active,
-          user_id
-        )
-      `
-      )
-      .eq('profiles.role', 'client')
+      .select('*')
       .order('created_at', { ascending: false });
 
     if (clientsError) throw clientsError;
+
+    // Fetch all profiles for these clients
+    const userIds = allClients?.map(client => client.user_id) || [];
+
+    if (userIds.length === 0) {
+      return new Response(
+        JSON.stringify({
+          success: true,
+          clients: [],
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
+    }
+
+    const { data: profiles, error: profilesError } = await supabaseAdmin
+      .from('profiles')
+      .select('user_id, email, full_name, role, is_active')
+      .in('user_id', userIds);
+
+    if (profilesError) throw profilesError;
+
+    // Create a map of profiles by user_id for easy lookup
+    const profilesMap = new Map(
+      profiles?.map(profile => [profile.user_id, profile]) || []
+    );
+
+    // Merge clients with their profiles
+    const clients = allClients?.map(client => ({
+      ...client,
+      profiles: profilesMap.get(client.user_id) || null,
+    })).filter(client => client.profiles && client.profiles.role === 'client');
 
     // Get all auth users to check confirmation status
     const {
