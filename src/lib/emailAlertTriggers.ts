@@ -11,25 +11,7 @@ export async function triggerNoSaleAlert(jobId: string): Promise<boolean> {
     // Get job details
     const { data: jobData, error: jobError } = await supabase
       .from('job_posts')
-      .select(
-        `
-        id,
-        title,
-        status,
-        payment_status,
-        created_at,
-        client_id,
-        clients!inner(
-          id,
-          company_name,
-          user_id,
-          profiles!inner(
-            email,
-            full_name
-          )
-        )
-      `
-      )
+      .select('id, title, status, payment_status, created_at, client_id')
       .eq('id', jobId)
       .single();
 
@@ -43,6 +25,30 @@ export async function triggerNoSaleAlert(jobId: string): Promise<boolean> {
       return true; // Not applicable, but not an error
     }
 
+    // Get client details
+    const { data: clientData, error: clientError } = await supabase
+      .from('clients')
+      .select('id, company_name, user_id')
+      .eq('id', jobData.client_id)
+      .single();
+
+    if (clientError || !clientData) {
+      console.error('Error fetching client data:', clientError);
+      return false;
+    }
+
+    // Get profile details
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('email, full_name')
+      .eq('user_id', clientData.user_id)
+      .single();
+
+    if (profileError || !profileData) {
+      console.error('Error fetching profile data:', profileError);
+      return false;
+    }
+
     // Send the alert via Supabase function
     // The function will fetch admin emails and configured recipients using service role key
     const { error: functionError } = await supabase.functions.invoke(
@@ -50,8 +56,8 @@ export async function triggerNoSaleAlert(jobId: string): Promise<boolean> {
       {
         body: {
           alertType: 'no_sale_job_staged',
-          clientName: jobData.clients.profiles.full_name || 'Client',
-          clientEmail: jobData.clients.profiles.email || '',
+          clientName: profileData.full_name || 'Client',
+          clientEmail: profileData.email || '',
           jobTitle: jobData.title,
           signupDate: jobData.created_at,
           dashboardUrl: `${window.location.origin}/dashboard/job-staging`,
@@ -91,22 +97,7 @@ export async function triggerJobStatusAlert(
     // Get job details
     const { data: jobData, error: jobError } = await supabase
       .from('job_posts')
-      .select(
-        `
-        id,
-        title,
-        status,
-        client_id,
-        clients!inner(
-          id,
-          company_name,
-          user_id,
-          profiles!inner(
-            email
-          )
-        )
-      `
-      )
+      .select('id, title, status, client_id')
       .eq('id', jobId)
       .single();
 
@@ -115,10 +106,34 @@ export async function triggerJobStatusAlert(
       return false;
     }
 
+    // Get client details
+    const { data: clientData, error: clientError } = await supabase
+      .from('clients')
+      .select('id, company_name, user_id')
+      .eq('id', jobData.client_id)
+      .single();
+
+    if (clientError || !clientData) {
+      console.error('Error fetching client data:', clientError);
+      return false;
+    }
+
+    // Get profile details
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('email')
+      .eq('user_id', clientData.user_id)
+      .single();
+
+    if (profileError || !profileData) {
+      console.error('Error fetching profile data:', profileError);
+      return false;
+    }
+
     // Send the alert
     const alertData = {
-      clientName: jobData.clients.company_name || 'Client',
-      clientEmail: jobData.clients.profiles.email || '',
+      clientName: clientData.company_name || 'Client',
+      clientEmail: profileData.email || '',
       jobTitle: jobData.title,
       jobStatus: newStatus as 'filled' | 'not_hired' | 'cancelled',
       candidateName,
@@ -183,20 +198,7 @@ export async function triggerClientRegisteredAlert(
     // Get client details
     const { data: clientData, error: clientError } = await supabase
       .from('clients')
-      .select(
-        `
-        id,
-        company_name,
-        created_at,
-        user_id,
-        contact_phone,
-        address,
-        profiles!inner(
-          email,
-          full_name
-        )
-      `
-      )
+      .select('id, company_name, created_at, user_id, contact_phone, address')
       .eq('id', clientId)
       .single();
 
@@ -205,6 +207,18 @@ export async function triggerClientRegisteredAlert(
         'Error fetching client data for registration alert:',
         clientError
       );
+      return false;
+    }
+
+    // Get profile details
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
+      .select('email, full_name')
+      .eq('user_id', clientData.user_id)
+      .single();
+
+    if (profileError || !profileData) {
+      console.error('Error fetching profile data:', profileError);
       return false;
     }
 
@@ -251,8 +265,8 @@ export async function triggerClientRegisteredAlert(
         body: {
           alertType: 'client_registered',
           recipientEmails: allRecipients,
-          clientName: clientData.profiles.full_name || 'Client',
-          clientEmail: clientData.profiles.email || '',
+          clientName: profileData.full_name || 'Client',
+          clientEmail: profileData.email || '',
           companyName: clientData.company_name || 'Company',
           signupDate: clientData.created_at,
           dashboardUrl: `${window.location.origin}/dashboard`,
@@ -294,24 +308,7 @@ export async function checkAndSendNoSaleAlerts(): Promise<{
 
     const { data: stagedJobs, error: jobsError } = await supabase
       .from('job_posts')
-      .select(
-        `
-        id,
-        title,
-        status,
-        payment_status,
-        created_at,
-        client_id,
-        clients!inner(
-          id,
-          company_name,
-          user_id,
-          profiles!inner(
-            email
-          )
-        )
-      `
-      )
+      .select('id, title, status, payment_status, created_at, client_id')
       .eq('status', 'draft')
       .neq('payment_status', 'completed')
       .lt('created_at', oneHourAgo);
@@ -325,12 +322,54 @@ export async function checkAndSendNoSaleAlerts(): Promise<{
       return { success: true, alertsSent: 0, errors: [] };
     }
 
+    // Get all client IDs
+    const clientIds = [...new Set(stagedJobs.map(j => j.client_id))];
+
+    // Fetch clients
+    const { data: clientsData, error: clientsError } = await supabase
+      .from('clients')
+      .select('id, company_name, user_id')
+      .in('id', clientIds);
+
+    if (clientsError) {
+      console.error('Error fetching clients:', clientsError);
+      return { success: false, alertsSent: 0, errors: [clientsError.message] };
+    }
+
+    // Get all user IDs
+    const userIds = [...new Set((clientsData || []).map(c => c.user_id))];
+
+    // Fetch profiles
+    const { data: profilesData, error: profilesError } = await supabase
+      .from('profiles')
+      .select('user_id, email')
+      .in('user_id', userIds);
+
+    if (profilesError) {
+      console.error('Error fetching profiles:', profilesError);
+      return { success: false, alertsSent: 0, errors: [profilesError.message] };
+    }
+
+    // Create maps for efficient lookup
+    const profilesMap = new Map(
+      (profilesData || []).map(p => [p.user_id, p])
+    );
+    const clientsMap = new Map(
+      (clientsData || []).map(c => [c.id, { ...c, profile: profilesMap.get(c.user_id) }])
+    );
+
     // Send alerts for each staged job
     for (const job of stagedJobs) {
       try {
+        const client = clientsMap.get(job.client_id);
+        if (!client) {
+          errors.push(`Client not found for job ${job.id}`);
+          continue;
+        }
+
         const alertData = {
-          clientName: job.clients.company_name || 'Client',
-          clientEmail: job.clients.profiles.email || '',
+          clientName: client.company_name || 'Client',
+          clientEmail: client.profile?.email || '',
           jobTitle: job.title,
           signupDate: job.created_at,
           dashboardUrl: `${window.location.origin}/dashboard/job-staging`,

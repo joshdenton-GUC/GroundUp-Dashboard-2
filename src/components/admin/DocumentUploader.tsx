@@ -74,19 +74,37 @@ export function DocumentUploader() {
   const fetchClients = useCallback(async () => {
     try {
       setLoadingClients(true);
-      const { data, error } = await supabase
+
+      // Fetch clients
+      const { data: clientsData, error: clientsError } = await supabase
         .from('clients')
-        .select('id, company_name, user_id, profiles(email)')
+        .select('id, company_name, user_id')
         .order('company_name');
 
-      if (error) throw error;
+      if (clientsError) throw clientsError;
+
+      // Get unique user IDs
+      const userIds = [...new Set((clientsData || []).map(c => c.user_id))];
+
+      // Fetch profiles for these user IDs
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('user_id, email')
+        .in('user_id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Create a map of profiles by user_id
+      const profilesMap = new Map(
+        (profilesData || []).map(p => [p.user_id, p])
+      );
 
       // Map the data to include email from profiles
-      const clientsWithEmail = (data || []).map(client => ({
+      const clientsWithEmail = (clientsData || []).map(client => ({
         id: client.id,
         company_name: client.company_name,
         user_id: client.user_id,
-        email: (client.profiles as any)?.email || null,
+        email: profilesMap.get(client.user_id)?.email || null,
       }));
 
       setClients(clientsWithEmail);
