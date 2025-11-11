@@ -80,8 +80,10 @@ serve(async req => {
 
     if (clientsError) throw clientsError;
 
-    // Fetch all profiles for these clients
-    const userIds = allClients?.map(client => client.user_id) || [];
+    // Fetch all profiles for these clients - filter out null/undefined user_ids
+    const userIds = (allClients || [])
+      .map(client => client.user_id)
+      .filter(id => id != null);
 
     if (userIds.length === 0) {
       return new Response(
