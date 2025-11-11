@@ -72,95 +72,18 @@ serve(async req => {
       );
     }
 
-    // Fetch all clients using direct REST API to bypass PostgREST relationship validation
-    console.log('Fetching clients...');
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
-    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+    // Use SQL function to fetch clients with profiles
+    // This bypasses PostgREST's foreign key validation issues
+    console.log('Fetching clients via SQL function...');
+    const { data: clientsWithStatus, error: rpcError } = await supabaseAdmin
+      .rpc('get_clients_with_status');
 
-    const clientsResponse = await fetch(
-      `${supabaseUrl}/rest/v1/clients?select=id,user_id,company_name,contact_phone,address,street1,street2,city,state,zip,welcome_email_sent,created_at,updated_at&order=created_at.desc`,
-      {
-        headers: {
-          'apikey': serviceRoleKey,
-          'Authorization': `Bearer ${serviceRoleKey}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=representation'
-        }
-      }
-    );
-
-    if (!clientsResponse.ok) {
-      const errorText = await clientsResponse.text();
-      console.error('Error fetching clients:', errorText);
-      throw new Error(`Failed to fetch clients: ${errorText}`);
+    if (rpcError) {
+      console.error('Error calling get_clients_with_status:', rpcError);
+      throw new Error(`Failed to fetch clients: ${rpcError.message}`);
     }
 
-    const allClients = await clientsResponse.json();
-    console.log(`Found ${allClients?.length || 0} clients`);
-
-    // Fetch all profiles for these clients - filter out null/undefined user_ids
-    const userIds = (allClients || [])
-      .map(client => client.user_id)
-      .filter(id => id != null);
-
-    console.log(`Found ${userIds.length} unique user IDs`);
-
-    if (userIds.length === 0) {
-      return new Response(
-        JSON.stringify({
-          success: true,
-          clients: [],
-        }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
-      );
-    }
-
-    console.log('Fetching profiles...');
-    const profilesResponse = await fetch(
-      `${supabaseUrl}/rest/v1/profiles?select=user_id,email,full_name,role,is_active&user_id=in.(${userIds.join(',')})`,
-      {
-        headers: {
-          'apikey': serviceRoleKey,
-          'Authorization': `Bearer ${serviceRoleKey}`,
-          'Content-Type': 'application/json',
-          'Prefer': 'return=representation'
-        }
-      }
-    );
-
-    if (!profilesResponse.ok) {
-      const errorText = await profilesResponse.text();
-      console.error('Error fetching profiles:', errorText);
-      throw new Error(`Failed to fetch profiles: ${errorText}`);
-    }
-
-    const profiles = await profilesResponse.json();
-    console.log(`Found ${profiles?.length || 0} profiles`);
-
-    // Create a map of profiles by user_id for easy lookup
-    const profilesMap = new Map(
-      profiles?.map(profile => [profile.user_id, profile]) || []
-    );
-
-    // Merge clients with their profiles
-    const clients = (allClients || [])
-      .map(client => ({
-        ...client,
-        profiles: profilesMap.get(client.user_id) || null,
-      }))
-      .filter(client => client.profiles && client.profiles.role === 'client');
-
-    // Map clients with basic status (skip auth user lookup for now)
-    const clientsWithStatus = clients?.map(client => {
-      return {
-        ...client,
-        invitation_status: 'confirmed', // Default to confirmed for now
-        email_confirmed_at: null,
-      };
-    });
+    console.log(`Found ${clientsWithStatus?.length || 0} clients`);
 
     return new Response(
       JSON.stringify({
