@@ -6,6 +6,7 @@ import { DocumentUploader } from './DocumentUploader';
 import { CandidateManager } from './CandidateManager';
 import { ClientManager } from './ClientManager';
 import { EmailAlertsManager } from './EmailAlertsManager';
+import { EmailAlertTester } from './EmailAlertTester';
 import { SecurityAuditLog } from './SecurityAuditLog';
 import { AddClientDialog } from './AddClientDialog';
 import {
@@ -454,6 +455,7 @@ export function AdminDashboard() {
 
         <TabsContent value="alerts" className="space-y-6">
           <EmailAlertsManager />
+          <EmailAlertTester />
         </TabsContent>
         <TabsContent value="security">
           <SecurityAuditLog />

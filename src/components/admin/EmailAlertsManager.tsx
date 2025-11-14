@@ -84,11 +84,17 @@ export const EmailAlertsManager = () => {
 
     setLoading(true);
     try {
+      // Get the current user ID
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
       const { error } = await supabase.from('email_alerts').insert([
         {
           alert_type: newAlert.alert_type,
           recipient_email: newAlert.recipient_email.trim(),
           is_active: newAlert.is_active,
+          created_by: user?.id,
         },
       ]);
 
