@@ -13,7 +13,6 @@ import { useToast } from '@/hooks/use-toast';
 import { JOB_PRICING, JobClassification, getStripe } from '@/lib/stripe';
 import { supabase } from '@/integrations/supabase/client';
 import { Check, CreditCard, Building2, Users } from 'lucide-react';
-import { loadStripe } from '@stripe/stripe-js';
 import {
   Elements,
   PaymentElement,
@@ -452,6 +451,13 @@ export function PaymentModal({
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
               <span className="ml-2">Setting up payment...</span>
+            </div>
+          ) : !getStripe() ? (
+            <div className="text-center py-8">
+              <p className="text-red-500 font-medium">Stripe is not configured</p>
+              <p className="text-gray-500 text-sm mt-2">
+                Please contact support to complete your payment.
+              </p>
             </div>
           ) : clientSecret ? (
             <Elements

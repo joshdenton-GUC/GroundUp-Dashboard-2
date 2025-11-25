@@ -1,14 +1,20 @@
-import { loadStripe, Stripe } from '@stripe/stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 
 // Stripe publishable key - replace with your actual publishable key
 const stripePublishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 
-let stripePromise: Promise<Stripe | null>;
+// Validate that the Stripe publishable key is configured
+if (!stripePublishableKey) {
+  console.error(
+    'Stripe publishable key is not configured. Please set VITE_STRIPE_PUBLISHABLE_KEY in your environment variables.'
+  );
+}
+
+// Initialize Stripe outside of component render to avoid recreating the Stripe object
+// This follows Stripe's React SDK best practices: https://docs.stripe.com/sdks/stripejs-react
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 
 export const getStripe = () => {
-  if (!stripePromise) {
-    stripePromise = loadStripe(stripePublishableKey);
-  }
   return stripePromise;
 };
 
